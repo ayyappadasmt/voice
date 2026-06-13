@@ -1,0 +1,12 @@
+{
+  "chunks": [
+    {
+      "id": "efbcb563-e21d-4c66-91f3-d630edf90f52",
+      "title": "About Us",
+      "content": "We are Acme Corp, a software company founded in 2010.",
+      "category": "company",
+      "created_at": "2026-06-13T11:16:45.608472",
+      "updated_at": "2026-06-13T11:16:45.608472"
+    }
+  ]
+}

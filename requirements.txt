@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+pydantic
+pydantic-settings
+twilio
+websockets
+google-generativeai
+httpx
+python-multipart
+numpy
+scikit-learn
+pytest
+pytest-asyncio
