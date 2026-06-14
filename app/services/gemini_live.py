@@ -46,14 +46,14 @@ async def handle_twilio_gemini_bridge(twilio_ws: WebSocket):
     settings = get_settings()
     stream_sid = None
 
-    gemini_url = f"{GEMINI_LIVE_URL}?key={settings.gemini_api_key}"
+    gemini_url = f"{GEMINI_LIVE_URL}?key={settings.GEMINI_API_KEY}"
 
     try:
         async with websockets.connect(gemini_url, ping_interval=20) as gemini_ws:
             # ── 1. Send Gemini setup message ──────────────────────────────
             setup_msg = {
                 "setup": {
-                    "model": f"models/{settings.gemini_model}",
+                    "model": f"models/{settings.GEMINI_MODEL}",
                     "generation_config": {
                         "response_modalities": ["AUDIO"],
                         "speech_config": {
