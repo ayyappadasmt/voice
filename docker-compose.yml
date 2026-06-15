@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   backend:
     build: .
@@ -8,5 +6,17 @@ services:
     env_file:
       - .env
     volumes:
-      - ./app/data:/app/app/data   # persist knowledge base
+      - ./app/data:/app/app/data # persist knowledge base
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./web
+      args:
+        # Browser talks to the backend WebSocket on the host.
+        NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-ws://localhost:8000/ws/voice}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
     restart: unless-stopped

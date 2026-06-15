@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background:
+    radial-gradient(900px 500px at 80% -10%, #1b2348 0%, transparent 60%),
+    radial-gradient(700px 500px at 0% 110%, #1a2140 0%, transparent 55%),
+    #0b0e1a;
+  color: #e8eaf6;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a3157;
+  border-radius: 8px;
+}

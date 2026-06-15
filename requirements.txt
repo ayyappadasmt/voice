@@ -10,5 +10,7 @@ httpx
 python-multipart
 numpy
 scikit-learn
+# audioop was removed from the stdlib in Python 3.13; backport for newer runtimes
+audioop-lts; python_version >= "3.13"
 pytest
 pytest-asyncio

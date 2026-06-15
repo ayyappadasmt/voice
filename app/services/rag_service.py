@@ -3,14 +3,18 @@ Simple TF-IDF based RAG for MVP.
 No vector DB needed - works with flat JSON file.
 Replace with Vertex AI Matching Engine when moving to GCP.
 """
-import json
-import os
+from datetime import datetime, timezone
 from pathlib import Path
+
+import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
 
 from app.models.knowledge import KnowledgeBase, KnowledgeChunk, KnowledgeChunkCreate, KnowledgeChunkUpdate
+
+
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
 
 DATA_FILE = Path(__file__).parent.parent / "data" / "knowledge_base.json"
 
@@ -51,9 +55,9 @@ def update_chunk(chunk_id: str, data: KnowledgeChunkUpdate) -> KnowledgeChunk | 
     kb = _load()
     for i, chunk in enumerate(kb.chunks):
         if chunk.id == chunk_id:
-            updated = chunk.model_copy(update={
-                k: v for k, v in data.model_dump().items() if v is not None
-            })
+            changes = {k: v for k, v in data.model_dump().items() if v is not None}
+            changes["updated_at"] = _now_iso()
+            updated = chunk.model_copy(update=changes)
             kb.chunks[i] = updated
             _save(kb)
             return updated

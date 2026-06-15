@@ -1,8 +1,21 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+
 from app.models.knowledge import KnowledgeChunk, KnowledgeChunkCreate, KnowledgeChunkUpdate
+from app.security import require_staff_api_key
 from app.services import rag_service
 
-router = APIRouter(prefix="/knowledge", tags=["knowledge"])
+# All knowledge-base management endpoints require a valid staff API key.
+router = APIRouter(
+    prefix="/knowledge",
+    tags=["knowledge"],
+    dependencies=[Depends(require_staff_api_key)],
+)
+
+
+@router.get("/verify")
+def verify_key():
+    """Lightweight endpoint the admin page uses to validate the staff key."""
+    return {"ok": True}
 
 
 @router.get("/", response_model=list[KnowledgeChunk])

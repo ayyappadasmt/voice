@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Voice AI · Knowledge Admin</title>
+  <style>
+    :root {
+      --bg: #0f1221;
+      --panel: #181c30;
+      --panel-2: #1f2440;
+      --border: #2b3157;
+      --text: #e7e9f3;
+      --muted: #9aa0c0;
+      --accent: #6c8cff;
+      --accent-2: #4f6ef7;
+      --danger: #ff5d6c;
+      --ok: #38d39f;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 80% -10%, #20264a 0%, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      padding: 22px 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid; place-items: center; font-weight: 700; color: white;
+    }
+    h1 { font-size: 18px; margin: 0; }
+    .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+    main { max-width: 920px; margin: 0 auto; padding: 28px; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      margin-bottom: 22px;
+    }
+    label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 6px; }
+    input, textarea, select {
+      width: 100%;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 11px 13px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); border-color: transparent; }
+    textarea { min-height: 96px; resize: vertical; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .row > * { flex: 1; min-width: 160px; }
+    button {
+      cursor: pointer; border: none; border-radius: 10px; padding: 11px 18px;
+      font-size: 14px; font-weight: 600; color: white;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      transition: transform .05s ease, opacity .2s ease;
+    }
+    button:hover { opacity: .92; }
+    button:active { transform: translateY(1px); }
+    button.ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    button.danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 7px 12px; font-size: 13px; }
+    button.small { padding: 7px 12px; font-size: 13px; }
+    .hidden { display: none !important; }
+    .item {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      background: var(--panel-2);
+    }
+    .item h3 { margin: 0 0 4px; font-size: 15px; }
+    .item .meta { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+    .item p { margin: 0 0 12px; white-space: pre-wrap; line-height: 1.5; font-size: 14px; }
+    .tag {
+      display: inline-block; font-size: 11px; padding: 2px 9px; border-radius: 999px;
+      background: rgba(108,140,255,.15); color: var(--accent); border: 1px solid rgba(108,140,255,.3);
+    }
+    .actions { display: flex; gap: 8px; }
+    .toast {
+      position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+      background: var(--panel-2); border: 1px solid var(--border); color: var(--text);
+      padding: 12px 18px; border-radius: 10px; font-size: 14px; opacity: 0;
+      transition: opacity .25s ease; pointer-events: none; max-width: 90vw;
+    }
+    .toast.show { opacity: 1; }
+    .toast.ok { border-color: var(--ok); }
+    .toast.err { border-color: var(--danger); }
+    .empty { color: var(--muted); text-align: center; padding: 26px; }
+    .keyhint { font-size: 12px; color: var(--muted); margin-top: 8px; }
+    .topbar-actions { display: flex; gap: 8px; align-items: center; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">AI</div>
+      <div>
+        <h1>Voice AI · Knowledge Admin</h1>
+        <div class="sub">Feed company information the phone assistant will use to answer callers.</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button id="logoutBtn" class="ghost small hidden">Lock</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Login -->
+    <section id="loginCard" class="card">
+      <h2 style="margin-top:0;font-size:16px;">Staff sign-in</h2>
+      <label for="apiKey">Staff API key</label>
+      <input id="apiKey" type="password" autocomplete="off" placeholder="Enter your staff API key" />
+      <div class="keyhint">The key is kept only in this browser tab and sent securely with each request.</div>
+      <div style="margin-top:14px;">
+        <button id="loginBtn">Unlock</button>
+      </div>
+    </section>
+
+    <!-- App -->
+    <div id="app" class="hidden">
+      <section class="card">
+        <h2 style="margin-top:0;font-size:16px;" id="formTitle">Add knowledge</h2>
+        <input id="editingId" type="hidden" />
+        <label for="title">Title</label>
+        <input id="title" maxlength="200" placeholder="e.g. Business hours" />
+        <div class="row">
+          <div>
+            <label for="category">Category</label>
+            <input id="category" maxlength="100" placeholder="e.g. general, pricing, support" />
+          </div>
+        </div>
+        <label for="content">Content</label>
+        <textarea id="content" maxlength="10000" placeholder="What should the assistant know? e.g. We are open Monday to Friday, 9am to 6pm."></textarea>
+        <div style="margin-top:14px; display:flex; gap:10px;">
+          <button id="saveBtn">Save</button>
+          <button id="cancelEditBtn" class="ghost hidden">Cancel</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <h2 style="margin:0;font-size:16px;">Knowledge base</h2>
+          <button id="refreshBtn" class="ghost small">Refresh</button>
+        </div>
+        <div id="list" style="margin-top:16px;"></div>
+      </section>
+    </div>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const API = ""; // same origin
+    const KEY_STORAGE = "voiceai_staff_key";
+    let apiKey = sessionStorage.getItem(KEY_STORAGE) || "";
+
+    const el = (id) => document.getElementById(id);
+    const toast = (msg, kind = "") => {
+      const t = el("toast");
+      t.textContent = msg;
+      t.className = "toast show " + kind;
+      setTimeout(() => (t.className = "toast"), 2800);
+    };
+
+    function authHeaders(extra = {}) {
+      return Object.assign({ "X-API-Key": apiKey }, extra);
+    }
+
+    async function api(path, options = {}) {
+      const res = await fetch(API + path, {
+        ...options,
+        headers: authHeaders(options.headers || {}),
+      });
+      if (res.status === 401 || res.status === 403) {
+        lock();
+        throw new Error("Unauthorized. Please check your staff API key.");
+      }
+      if (!res.ok) {
+        let detail = "Request failed (" + res.status + ")";
+        try { const j = await res.json(); if (j.detail) detail = j.detail; } catch (_) {}
+        throw new Error(detail);
+      }
+      return res.status === 204 ? null : res.json();
+    }
+
+    function showApp() {
+      el("loginCard").classList.add("hidden");
+      el("app").classList.remove("hidden");
+      el("logoutBtn").classList.remove("hidden");
+      loadList();
+    }
+
+    function lock() {
+      apiKey = "";
+      sessionStorage.removeItem(KEY_STORAGE);
+      el("app").classList.add("hidden");
+      el("logoutBtn").classList.add("hidden");
+      el("loginCard").classList.remove("hidden");
+      el("apiKey").value = "";
+    }
+
+    async function login() {
+      const val = el("apiKey").value.trim();
+      if (!val) { toast("Enter your staff API key.", "err"); return; }
+      apiKey = val;
+      try {
+        await api("/knowledge/verify");
+        sessionStorage.setItem(KEY_STORAGE, apiKey);
+        showApp();
+        toast("Signed in.", "ok");
+      } catch (e) {
+        apiKey = "";
+        toast(e.message, "err");
+      }
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return "";
+      const d = new Date(iso);
+      return isNaN(d) ? "" : d.toLocaleString();
+    }
+
+    async function loadList() {
+      const list = el("list");
+      list.textContent = "Loading…";
+      try {
+        const chunks = await api("/knowledge/");
+        list.innerHTML = "";
+        if (!chunks.length) {
+          const e = document.createElement("div");
+          e.className = "empty";
+          e.textContent = "No knowledge yet. Add the first entry above.";
+          list.appendChild(e);
+          return;
+        }
+        for (const c of chunks) list.appendChild(renderItem(c));
+      } catch (e) {
+        list.textContent = "";
+        toast(e.message, "err");
+      }
+    }
+
+    // Build item nodes with textContent only -> no HTML injection from data.
+    function renderItem(c) {
+      const wrap = document.createElement("div");
+      wrap.className = "item";
+
+      const h = document.createElement("h3");
+      h.textContent = c.title;
+      wrap.appendChild(h);
+
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = c.category || "general";
+      meta.appendChild(tag);
+      meta.appendChild(document.createTextNode("  ·  updated " + fmtDate(c.updated_at)));
+      wrap.appendChild(meta);
+
+      const p = document.createElement("p");
+      p.textContent = c.content;
+      wrap.appendChild(p);
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+
+      const editBtn = document.createElement("button");
+      editBtn.className = "ghost small";
+      editBtn.textContent = "Edit";
+      editBtn.onclick = () => startEdit(c);
+
+      const delBtn = document.createElement("button");
+      delBtn.className = "danger";
+      delBtn.textContent = "Delete";
+      delBtn.onclick = () => removeItem(c);
+
+      actions.appendChild(editBtn);
+      actions.appendChild(delBtn);
+      wrap.appendChild(actions);
+      return wrap;
+    }
+
+    function startEdit(c) {
+      el("editingId").value = c.id;
+      el("title").value = c.title;
+      el("category").value = c.category || "";
+      el("content").value = c.content;
+      el("formTitle").textContent = "Edit knowledge";
+      el("cancelEditBtn").classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function resetForm() {
+      el("editingId").value = "";
+      el("title").value = "";
+      el("category").value = "";
+      el("content").value = "";
+      el("formTitle").textContent = "Add knowledge";
+      el("cancelEditBtn").classList.add("hidden");
+    }
+
+    async function save() {
+      const id = el("editingId").value;
+      const title = el("title").value.trim();
+      const content = el("content").value.trim();
+      const category = el("category").value.trim() || "general";
+      if (!title || !content) { toast("Title and content are required.", "err"); return; }
+
+      const body = JSON.stringify({ title, content, category });
+      const headers = { "Content-Type": "application/json" };
+      try {
+        if (id) {
+          await api("/knowledge/" + encodeURIComponent(id), { method: "PUT", headers, body });
+          toast("Updated.", "ok");
+        } else {
+          await api("/knowledge/", { method: "POST", headers, body });
+          toast("Added.", "ok");
+        }
+        resetForm();
+        loadList();
+      } catch (e) {
+        toast(e.message, "err");
+      }
+    }
+
+    async function removeItem(c) {
+      if (!confirm('Delete "' + c.title + '"?')) return;
+      try {
+        await api("/knowledge/" + encodeURIComponent(c.id), { method: "DELETE" });
+        toast("Deleted.", "ok");
+        loadList();
+      } catch (e) {
+        toast(e.message, "err");
+      }
+    }
+
+    el("loginBtn").onclick = login;
+    el("apiKey").addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
+    el("logoutBtn").onclick = lock;
+    el("saveBtn").onclick = save;
+    el("cancelEditBtn").onclick = resetForm;
+    el("refreshBtn").onclick = loadList;
+
+    // Auto sign-in if a key is already present in this tab.
+    if (apiKey) { showApp(); }
+  </script>
+</body>
+</html>
